@@ -27,13 +27,14 @@
 -- OF THE POSSIBILITY OF SUCH DAMAGE.
 -- ------------------------------------------------------------------------
 
--- how much log information is printed: 3 => verbose, 2 => info, 1 => only warning and errors, 0 => only errors, -1 => silent
+-- how much log information is LOG_FUNCTIONed: 3 => verbose, 2 => info, 1 => only warning and errors, 0 => only errors, -1 => silent
 local LOG_LEVEL = 1
 
--- prefix for the printed logs
+-- prefix for the LOG_FUNCTIONed logs
 local LOG_PREFIX = "LuaLinq: "
 
-
+-- Igneous01 - LOG_FUNCTION/log method to use (DCS environment does not support 'LOG_FUNCTION' but supports 'env.info'
+local LOG_FUNCTION = print
 
 
 
@@ -50,7 +51,7 @@ end
 
 local function _log(level, prefix, text)
 	if (level <= LOG_LEVEL) then
-		print(prefix .. LOG_PREFIX .. text)
+		LOG_FUNCTION(prefix .. LOG_PREFIX .. text)
 	end
 end
 
@@ -61,25 +62,35 @@ local function logq(self, method)
 end
 
 local function _dumpData(self)
-	local items = #self.m_Data
-	local dumpdata = "q{ "
-	
-	for i = 1, 3 do
-		if (i <= items) then
-			if (i ~= 1) then
-				dumpdata = dumpdata .. ", "
-			end
-			dumpdata = dumpdata .. tostring(self.m_Data[i])
-		end
-	end
-	
-	if (items > 3) then
-		dumpdata = dumpdata .. ", ..." .. items .. " }"
-	else
-		dumpdata = dumpdata .. " }"
-	end
+  local items = #self.m_Data
+  local dumpdata = "q{ "
+  
+  for i = 1, 3 do
+    if (i <= items) then
+      if (i ~= 1) then
+        dumpdata = dumpdata .. ", "
+      end
+      local val = ""
+      if type(self.m_Data[i]) == "table" then
+        val = "table { "
+        for k,v in pairs(self.m_Data[i]) do
+          val = val .. k .. " = " .. tostring(v) .. ", "
+        end
+        val = val .. "}"
+      else
+        val = tostring(self.m_Data[i])
+      end
+      dumpdata = dumpdata .. val
+    end
+  end
+  
+  if (items > 3) then
+    dumpdata = dumpdata .. ", ..." .. items .. " }"
+  else
+    dumpdata = dumpdata .. " }"
+  end
 
-	return dumpdata
+  return dumpdata
 end
 
 
@@ -604,7 +615,7 @@ end
 
 -- Prints debug data.
 function _dump(self)
-	print(_dumpData(self));
+	LOG_FUNCTION(_dumpData(self));
 end
 
 -- Returns a random item in the collection, or default if no items are present
