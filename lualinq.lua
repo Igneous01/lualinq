@@ -111,6 +111,7 @@ local function loge(txt)
 	_log(0, "[E!] ", txt)
 end
 
+local _tableInsert = table.insert
 
 -- ============================================================
 -- CONSTRUCTOR
@@ -217,7 +218,7 @@ local function _new_lualinq(method, collection)
 	self.intersectBy    = _intersectionby
 	
 	
-	logq(self, "from")
+	logq(self, method)
 
 	return self
 end
@@ -255,7 +256,7 @@ end
 function fromArray(array)
 	local collection = { }
 	for k,v in ipairs(array) do
-		table.insert(collection, v)
+		_tableInsert(collection, v)
 	end
 	return _new_lualinq("fromArray", collection)
 end
@@ -269,7 +270,7 @@ function fromDictionary(dictionary)
 		kvp.key = k
 		kvp.value = v
 		
-		table.insert(collection, kvp)
+		_tableInsert(collection, kvp)
 	end
 	
 	return _new_lualinq("fromDictionary", collection)
@@ -280,7 +281,7 @@ function fromIterator(iterator)
 	local collection = { }
 	
 	for s in iterator do
-		table.insert(collection, s)
+		_tableInsert(collection, s)
 	end
 	
 	return _new_lualinq("fromIterator", collection)
@@ -292,7 +293,7 @@ function fromIteratorsArray(iteratorArray)
 
 	for _, iterator in ipairs(iteratorArray) do
 		for s in iterator do
-			table.insert(collection, s)
+			_tableInsert(collection, s)
 		end
 	end
 	
@@ -304,7 +305,7 @@ function fromSet(set)
 	local collection = { }
 
 	for k,v in pairs(set) do
-		table.insert(collection, k)
+		_tableInsert(collection, k)
 	end
 	
 	return _new_lualinq("fromIteratorsArray", collection)
@@ -325,10 +326,10 @@ function _concat(self, otherlinq)
 	local result = { }
 
 	for idx, value in ipairs(self.m_Data) do
-		table.insert(result, value)
+		_tableInsert(result, value)
 	end
 	for idx, value in ipairs(otherlinq.m_Data) do
-		table.insert(result, value)
+		_tableInsert(result, value)
 	end
 	
 	return _new_lualinq(":concat", result)
@@ -342,14 +343,14 @@ function _select(self, selector)
 		for idx, value in ipairs(self.m_Data) do
 			local newvalue = selector(value)
 			if (newvalue ~= nil) then
-				table.insert(result, newvalue)
+				_tableInsert(result, newvalue)
 			end
 		end
 	elseif (type(selector) == "string") then
 		for idx, value in ipairs(self.m_Data) do
 			local newvalue = value[selector]
 			if (newvalue ~= nil) then
-				table.insert(result, newvalue)
+				_tableInsert(result, newvalue)
 			end
 		end
 	else
@@ -368,7 +369,7 @@ function _selectMany(self, selector)
 		if (newvalue ~= nil) then
 			for ii, vv in ipairs(newvalue) do
 				if (vv ~= nil) then
-					table.insert(result, vv)
+					_tableInsert(result, vv)
 				end
 			end
 		end
@@ -385,25 +386,25 @@ function _where(self, predicate, refvalue, ...)
 	if (type(predicate) == "function") then
 		for idx, value in ipairs(self.m_Data) do
 			if (predicate(value, refvalue, from({...}):toTuple())) then
-				table.insert(result, value)
+				_tableInsert(result, value)
 			end
 		end	
 	elseif (type(predicate) == "string") then
 		local refvals = {...}
 		
 		if (#refvals > 0) then
-			table.insert(refvals, refvalue);
+			_tableInsert(refvals, refvalue);
 			return _intersectionby(self, predicate, refvals);
 		elseif (refvalue ~= nil) then
 			for idx, value in ipairs(self.m_Data) do
 				if (value[predicate] == refvalue) then
-					table.insert(result, value)
+					_tableInsert(result, value)
 				end
 			end	
 		else
 			for idx, value in ipairs(self.m_Data) do
 				if (value[predicate] ~= nil) then
-					table.insert(result, value)
+					_tableInsert(result, value)
 				end
 			end	
 		end
@@ -423,7 +424,7 @@ function _whereIndex(self, predicate)
 
 	for idx, value in ipairs(self.m_Data) do
 		if (predicate(idx, value)) then
-			table.insert(result, value)
+			_tableInsert(result, value)
 		end
 	end	
 	
@@ -472,7 +473,7 @@ function _distinct(self, comparator)
 		end
 	
 		if (not found) then
-			table.insert(result, value)
+			_tableInsert(result, value)
 		end
 	end
 	
