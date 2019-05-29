@@ -144,6 +144,9 @@ function autoexec()
 
 	testname = "Test #" ..  14
 	asserteq(lualinq.from(array):contains("hello"), true)
+	
+	testname = "Test #" ..  14
+  asserteq(lualinq.from(array):contains("hello", function(a, item) return a == item end), true)
 
 	testname = "Test #" ..  15
 	asserteq(lualinq.from(array):contains("qweqhello"), false)
