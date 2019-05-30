@@ -33,6 +33,9 @@ array6 = {
     }  
   }
 }
+array7 = {
+  { name="john", age=21 },
+}
 testname = ""
 allok = true
 
@@ -238,6 +241,14 @@ function autoexec()
                  :select(function(v) return v.name .. " " .. v.surname end)
                  :toArray()
       end)
+      :foreach(assertArray)
+  assertArrayEnd()
+  
+  testname = "Test #" ..  28
+  assertArrayBegin({ "john snow 21" })
+  lualinq.from(array6.a)
+      :join(array7, function(a,b) return a.name == b.name end, function(a,b) return { name=a.name, surname=a.surname, age=b.age} end)
+      :select(function(a) return a.name .. " " .. a.surname .. " " .. a.age end)
       :foreach(assertArray)
   assertArrayEnd()
 	
