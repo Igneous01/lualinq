@@ -436,14 +436,14 @@ end
 -- Return a linq data structure with at most the first howmany elements
 function _take(self, howmany)
   local result = self:whereIndex(function(i, v) return i <= howmany; end)
-  logq(result, ":take")
+  logq(result.m_Data, ":take")
   return result
 end
 
 -- Return a linq data structure skipping the first howmany elements
 function _skip(self, howmany)
   local result = self:whereIndex(function(i, v) return i > howmany; end)
-  logq(result, ":skip")
+  logq(result.m_Data, ":skip")
   return result
 end
 
@@ -489,7 +489,7 @@ end
 -- Returns the union of two collections, using an optional comparator
 function _union(self, other, comparator)
   local results = self:concat(from(other)):distinct(comparator)
-  logq(results, ":union")
+  logq(results.m_Data, ":union")
   return results
 end
 
@@ -497,7 +497,7 @@ end
 function _except(self, other, comparator)
   other = from(other)
   local results = self:where(function (v) return not other:contains(v, comparator) end)
-  logq(results, ":except")
+  logq(results.m_Data, ":except")
   return results
 end
 
@@ -505,7 +505,7 @@ end
 function _intersection(self, other, comparator)
   other = from(other)
   local results = self:where(function (v) return other:contains(v, comparator) end)
-  logq(results, ":intersection")
+  logq(results.m_Data, ":intersection")
   return results
 end
 
@@ -513,7 +513,7 @@ end
 function _exceptby(self, property, other)
   other = from(other)
   local results = self:where(function (v) return not other:contains(v[property]) end)
-  logq(results, ":exceptBy")
+  logq(results.m_Data, ":exceptBy")
   return results
 end
 
@@ -521,7 +521,7 @@ end
 function _intersectionby(self, property, other)
   other = from(other)
   local results = self:where(function (v) return other:contains(v[property]) end)
-  logq(results, ":intersectionBy")
+  logq(results.m_Data, ":intersectionBy")
   return results
 end
 
